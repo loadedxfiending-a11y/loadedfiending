@@ -1,4 +1,5 @@
-from flask import Flask, render_template_string
+from flask import Flask, render_template_string, send_from_directory
+import os
 
 app = Flask(__name__)
 
@@ -45,16 +46,33 @@ HTML = """<!DOCTYPE html>
             text-align: center;
             text-shadow: 0 0 15px #ff0000, 0 0 30px #aa0000;
             background: rgba(0,0,0,0.85);
-            padding: 1.8rem 2.5rem;
+            padding: 2rem 2.5rem;
             border: 2px solid #ff3333;
             border-radius: 10px;
             box-shadow: 0 0 25px rgba(255,0,0,0.25);
             z-index: 10;
-            white-space: pre-line;
-            line-height: 1.6;
             animation: fadeIn 0.3s ease;
+            max-width: 90vw;
         }
         #info.show { display: block; }
+        
+        /* Profile Picture Styling */
+        #pfp {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            border: 2px solid #ff3333;
+            box-shadow: 0 0 15px #ff0000;
+            margin: 0 auto 1.5rem auto;
+            display: block;
+            object-fit: cover;
+        }
+
+        .text-content {
+            white-space: pre-line;
+            line-height: 1.6;
+        }
+
         @keyframes fadeIn {
             from { opacity: 0; transform: translate(-50%, -50%) scale(0.9); }
             to { opacity: 1; transform: translate(-50%, -50%) scale(1); }
@@ -117,16 +135,20 @@ HTML = """<!DOCTYPE html>
 <body>
     <canvas id="matrix"></canvas>
     <div id="prompt">click on the screen to learn about me!</div>
+    
     <div id="info">
-        Hey, I'm dream/loaded
-        I'm learning more about
-        C++, C#, HTML
-        ...ye, that's about all
+        <img id="pfp" src="/pfp.webp" alt="pfp">
+        <div class="text-content">Hey, I'm dream/loaded
+            I'm learning more about
+            C++, C#, HTML
+            ...ye, that's about all</div>
     </div>
-    <audio id="bg-music" crossorigin="anonymous" loop preload="auto">
-        <source src="https://files.catbox.moe/2sreco.mp3" type="audio/mpeg"> <!-- ← Replace this -->
+
+    <audio id="bg-music" loop preload="auto">
+        <source src="https://files.catbox.moe/2sreco.mp3" type="audio/mpeg">
         Your browser does not support the audio element.
     </audio>
+
     <div id="volume-control">
         <label>♪ VOL</label>
         <input type="range" id="volume-slider" min="0" max="100" value="50">
@@ -183,10 +205,19 @@ HTML = """<!DOCTYPE html>
         audio.volume = 0.5;
 
         function startAudio() {
+            // Force reload if state is stuck
+            if (audio.readyState === 0) {
+                audio.load();
+            }
+            
             audio.play().then(() => {
-                console.log("Holy War playing 🔥");
+                print("Audio playing successfully.");
             }).catch(err => {
-                console.error("Audio play failed:", err);
+                print("Playback blocked or failed. Trying reload...", err);
+                // Fallback attempt
+                setTimeout(() => {
+                    audio.play().catch(e => console.log("Final playback block:", e));
+                }, 100);
             });
         }
 
@@ -217,6 +248,11 @@ HTML = """<!DOCTYPE html>
 @app.route('/')
 def index():
     return render_template_string(HTML)
+
+# Route to serve the profile picture from the local root folder
+@app.route('/pfp.webp')
+def serve_pfp():
+    return send_from_directory(os.getcwd(), 'pfp.webp')
 
 if __name__ == '__main__':
     app.run(debug=True)
