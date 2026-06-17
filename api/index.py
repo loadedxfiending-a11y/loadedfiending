@@ -32,7 +32,7 @@ HTML = """<!DOCTYPE html>
         }
         @keyframes pulse {
             0%, 100% { opacity: 0.4; }
-            50%      { opacity: 1; }
+            50% { opacity: 1; }
         }
         #info {
             display: none;
@@ -57,7 +57,7 @@ HTML = """<!DOCTYPE html>
         #info.show { display: block; }
         @keyframes fadeIn {
             from { opacity: 0; transform: translate(-50%, -50%) scale(0.9); }
-            to   { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+            to { opacity: 1; transform: translate(-50%, -50%) scale(1); }
         }
         #volume-control {
             position: fixed;
@@ -123,12 +123,10 @@ HTML = """<!DOCTYPE html>
         C++, C#, HTML
         ...ye, that's about all
     </div>
-
-    <audio id="bg-music" loop prefetch="auto">
-        <source src="https://files.catbox.moe/2sreco.mp3" type="audio/mpeg">
+    <audio id="bg-music" crossorigin="anonymous" loop preload="auto">
+        <source src="https://files.catbox.moe/2sreco.mp3" type="audio/mpeg"> <!-- ← Replace this -->
         Your browser does not support the audio element.
     </audio>
-
     <div id="volume-control">
         <label>♪ VOL</label>
         <input type="range" id="volume-slider" min="0" max="100" value="50">
@@ -153,11 +151,9 @@ HTML = """<!DOCTYPE html>
         function draw() {
             ctx.fillStyle = 'rgba(0, 0, 0, 0.07)';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
-
             for (let i = 0; i < drops.length; i++) {
                 const x = i * 18;
                 const y = drops[i] * 18;
-
                 ctx.fillStyle = 'rgba(255, 50, 50, 0.2)';
                 ctx.beginPath();
                 ctx.arc(x, y, 2, 0, Math.PI * 2);
@@ -177,7 +173,7 @@ HTML = """<!DOCTYPE html>
         }
         setInterval(draw, 40);
 
-        // ── Application Elements & State Management ──
+        // ── Audio & UI ──
         const infoBox = document.getElementById('info');
         const prompt = document.getElementById('prompt');
         const audio = document.getElementById('bg-music');
@@ -188,31 +184,31 @@ HTML = """<!DOCTYPE html>
 
         function startAudio() {
             audio.play().then(() => {
-                console.log("Playback started successfully.");
+                console.log("Holy War playing 🔥");
             }).catch(err => {
-                console.log("Audio play blocked or failed: ", err);
+                console.error("Audio play failed:", err);
             });
         }
 
-        // ── Interaction Event Bindings ──
+        // Volume control
+        slider.addEventListener('input', () => {
+            const vol = slider.value / 100;
+            audio.volume = vol;
+            volLabel.textContent = Math.round(vol * 100) + '%';
+        });
+
+        // Click to play + show info
         canvas.addEventListener('click', () => {
             startAudio();
             infoBox.classList.add('show');
             prompt.style.display = 'none';
         });
 
-        // Stops code from breaking/disappearing when clicking inside the panel
+        // Clicking info closes it
         infoBox.addEventListener('click', (e) => {
-            e.stopPropagation(); 
+            e.stopPropagation();
             infoBox.classList.remove('show');
             prompt.style.display = 'block';
-        });
-
-        // ── Control Volume Interface ──
-        slider.addEventListener('input', () => {
-            const vol = slider.value / 100;
-            audio.volume = vol;
-            volLabel.textContent = Math.round(vol * 100) + '%';
         });
     </script>
 </body>
@@ -223,4 +219,4 @@ def index():
     return render_template_string(HTML)
 
 if __name__ == '__main__':
-    app.run()
+    app.run(debug=True)
