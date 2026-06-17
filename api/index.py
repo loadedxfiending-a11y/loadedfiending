@@ -23,8 +23,8 @@ HTML = """<!DOCTYPE html>
             bottom: 3rem;
             left: 50%;
             transform: translateX(-50%);
-            color: rgba(255, 60, 60, 0.6);
-            font-size: 0.9rem;
+            color: rgba(255, 60, 60, 0.7);
+            font-size: 1.3rem;
             letter-spacing: 1px;
             z-index: 5;
             pointer-events: none;
@@ -41,17 +41,17 @@ HTML = """<!DOCTYPE html>
             left: 50%;
             transform: translate(-50%, -50%);
             color: #ff3333;
-            font-size: 1.2rem;
+            font-size: 1.6rem;
             text-align: center;
             text-shadow: 0 0 15px #ff0000, 0 0 30px #aa0000;
-            background: rgba(0,0,0,0.8);
-            padding: 1.2rem 2rem;
-            border: 1px solid #ff3333;
-            border-radius: 8px;
-            box-shadow: 0 0 20px rgba(255,0,0,0.2);
+            background: rgba(0,0,0,0.85);
+            padding: 1.8rem 2.5rem;
+            border: 2px solid #ff3333;
+            border-radius: 10px;
+            box-shadow: 0 0 25px rgba(255,0,0,0.25);
             z-index: 10;
             white-space: pre-line;
-            line-height: 1.5;
+            line-height: 1.6;
             pointer-events: none;
             animation: fadeIn 0.3s ease;
         }
@@ -60,6 +60,15 @@ HTML = """<!DOCTYPE html>
             from { opacity: 0; transform: translate(-50%, -50%) scale(0.9); }
             to   { opacity: 1; transform: translate(-50%, -50%) scale(1); }
         }
+        #audio-player {
+            position: fixed;
+            bottom: 0.5rem;
+            right: 0.5rem;
+            z-index: 20;
+            opacity: 0.5;
+            transition: opacity 0.3s;
+        }
+        #audio-player:hover { opacity: 1; }
     </style>
 </head>
 <body>
@@ -71,6 +80,17 @@ HTML = """<!DOCTYPE html>
         C++, C#, HTML
         ...ye, that's about all
     </div>
+
+    <!-- YouTube audio embed -->
+    <div id="audio-player">
+        <iframe width="200" height="50"
+                src="https://www.youtube.com/embed/viRBj5CMiZ8?autoplay=1&loop=1&playlist=viRBj5CMiZ8"
+                frameborder="0"
+                allow="autoplay; encrypted-media"
+                allowfullscreen>
+        </iframe>
+    </div>
+
     <script>
         const canvas = document.getElementById('matrix');
         const ctx = canvas.getContext('2d');
