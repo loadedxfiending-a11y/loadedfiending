@@ -60,15 +60,59 @@ HTML = """<!DOCTYPE html>
             from { opacity: 0; transform: translate(-50%, -50%) scale(0.9); }
             to   { opacity: 1; transform: translate(-50%, -50%) scale(1); }
         }
-        #audio-player {
+        #volume-control {
             position: fixed;
-            bottom: 0.5rem;
-            right: 0.5rem;
+            top: 1rem;
+            left: 1rem;
             z-index: 20;
-            opacity: 0.5;
-            transition: opacity 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(0,0,0,0.7);
+            padding: 0.5rem 1rem;
+            border: 1px solid rgba(255,50,50,0.3);
+            border-radius: 8px;
         }
-        #audio-player:hover { opacity: 1; }
+        #volume-control label {
+            color: #ff4444;
+            font-size: 0.8rem;
+            font-family: 'Courier New', monospace;
+            letter-spacing: 1px;
+        }
+        #volume-control input[type="range"] {
+            width: 80px;
+            height: 4px;
+            -webkit-appearance: none;
+            appearance: none;
+            background: #ff3333;
+            border-radius: 2px;
+            outline: none;
+            cursor: pointer;
+        }
+        #volume-control input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #ff3333;
+            cursor: pointer;
+            box-shadow: 0 0 6px #ff0000;
+        }
+        #volume-control input[type="range"]::-moz-range-thumb {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #ff3333;
+            cursor: pointer;
+            border: none;
+        }
+        #vol-label {
+            color: #ff6666;
+            font-size: 0.8rem;
+            min-width: 35px;
+            text-align: center;
+        }
     </style>
 </head>
 <body>
@@ -81,17 +125,20 @@ HTML = """<!DOCTYPE html>
         ...ye, that's about all
     </div>
 
-    <!-- YouTube audio embed -->
-    <div id="audio-player">
-        <iframe width="200" height="50"
-                src="https://www.youtube.com/embed/viRBj5CMiZ8?autoplay=1&loop=1&playlist=viRBj5CMiZ8"
-                frameborder="0"
-                allow="autoplay; encrypted-media"
-                allowfullscreen>
-        </iframe>
+    <!-- Hidden audio + volume slider -->
+    <audio id="bg-music" autoplay loop>
+        <source src="https://www.youtube.com/redirect?event=video_description&redir_token=QUFFLUhqbFhIZjZ1dEx3cDRDcGFYZ3VieGxLZ0RTdFJRd3xBQ3Jtc0tsU3JSWl9JWVdiWU5YajhZT1NPNU1fTE1yR1J6c2l3Q0F0VUJHNFpJMmhnVHVFRDViVHRCZDB2TVR2TjNZTHdhUHJEWTNGQWk1d3FaTzgtRjFSVTlyYzNaSE1hTmh4TEJVa1VwVlN2MEltTUpXbE5RQQ&q=https%3A%2F%2Fwww.dropbox.com%2Fscl%2Ffi%2F6o3k5z2q8u5x1v8w9y0z2%2Fdream-loaded-music.mp3%3Frlkey%3Dabc123%26dl%3D0" type="audio/mpeg">
+        Your browser does not support the audio element.
+    </audio>
+
+    <div id="volume-control">
+        <label>♪ VOL</label>
+        <input type="range" id="volume-slider" min="0" max="100" value="50">
+        <span id="vol-label">50%</span>
     </div>
 
     <script>
+        // ── Matrix Rain ──
         const canvas = document.getElementById('matrix');
         const ctx = canvas.getContext('2d');
         let cols, drops;
@@ -113,13 +160,11 @@ HTML = """<!DOCTYPE html>
                 const x = i * 18;
                 const y = drops[i] * 18;
 
-                // tail dot
                 ctx.fillStyle = 'rgba(255, 50, 50, 0.2)';
                 ctx.beginPath();
                 ctx.arc(x, y, 2, 0, Math.PI * 2);
                 ctx.fill();
 
-                // head dot - brighter
                 ctx.fillStyle = '#ff3333';
                 ctx.shadowBlur = 12;
                 ctx.shadowColor = '#ff0000';
@@ -134,6 +179,7 @@ HTML = """<!DOCTYPE html>
         }
         setInterval(draw, 40);
 
+        // ── Click handler ──
         const infoBox = document.getElementById('info');
         const prompt = document.getElementById('prompt');
 
@@ -150,6 +196,20 @@ HTML = """<!DOCTYPE html>
             infoBox.classList.remove('show');
             prompt.style.display = 'block';
             clearTimeout(window.infoTimeout);
+        });
+
+        // ── Volume control ──
+        const audio = document.getElementById('bg-music');
+        const slider = document.getElementById('volume-slider');
+        const volLabel = document.getElementById('vol-label');
+
+        // Set initial volume to 50%
+        audio.volume = 0.5;
+
+        slider.addEventListener('input', () => {
+            const vol = slider.value / 100;
+            audio.volume = vol;
+            volLabel.textContent = Math.round(vol * 100) + '%';
         });
     </script>
 </body>
