@@ -52,7 +52,6 @@ HTML = """<!DOCTYPE html>
             z-index: 10;
             white-space: pre-line;
             line-height: 1.6;
-            pointer-events: none;
             animation: fadeIn 0.3s ease;
         }
         #info.show { display: block; }
@@ -137,7 +136,7 @@ HTML = """<!DOCTYPE html>
     </div>
 
     <script>
-        // ── Matrix Rain ──
+        // ── Matrix Rain Effect ──
         const canvas = document.getElementById('matrix');
         const ctx = canvas.getContext('2d');
         let cols, drops;
@@ -178,44 +177,36 @@ HTML = """<!DOCTYPE html>
         }
         setInterval(draw, 40);
 
-        // ── Elements ──
+        // ── Application Elements & State Management ──
         const infoBox = document.getElementById('info');
         const prompt = document.getElementById('prompt');
         const audio = document.getElementById('bg-music');
         const slider = document.getElementById('volume-slider');
         const volLabel = document.getElementById('vol-label');
 
-        // Set initial volume to 50%
         audio.volume = 0.5;
 
-        // Function to securely play audio after user interaction
         function startAudio() {
             audio.play().catch(err => {
-                console.log("Playback blocked or link configuration issue: ", err);
+                console.log("Audio initialization restriction handled or resource structure altered: ", err);
             });
         }
 
-        // ── Click handler ──
+        // ── Interaction Event Bindings ──
         canvas.addEventListener('click', () => {
-            // Trigger playback on click to satisfy browser policies
             startAudio();
-
             infoBox.classList.add('show');
             prompt.style.display = 'none';
-            clearTimeout(window.infoTimeout);
-            window.infoTimeout = setTimeout(() => {
-                infoBox.classList.remove('show');
-                prompt.style.display = 'block';
-            }, 8000);
         });
 
-        infoBox.addEventListener('click', () => {
+        // Clicking directly on the text box will clear it and restore the initial state
+        infoBox.addEventListener('click', (e) => {
+            e.stopPropagation(); // Avoid triggering canvas handler elements
             infoBox.classList.remove('show');
             prompt.style.display = 'block';
-            clearTimeout(window.infoTimeout);
         });
 
-        // ── Volume control ──
+        // ── Control Volume Interface ──
         slider.addEventListener('input', () => {
             const vol = slider.value / 100;
             audio.volume = vol;
