@@ -125,7 +125,7 @@ HTML = """<!DOCTYPE html>
     </div>
 
     <audio id="bg-music" loop>
-        <source src="https://www.dropbox.com/scl/fi/6o3k5z2q8u5x1v8w9y0z2/dream-loaded-music.mp3?rlkey=abc123&raw=1" type="audio/mpeg">
+        <source src="https://www.youtube.com/watch?v=viRBj5CMiZ8&list=RDMMviRBj5CMiZ8&index=1" type="audio/mpeg">
         Your browser does not support the audio element.
     </audio>
 
@@ -188,7 +188,7 @@ HTML = """<!DOCTYPE html>
 
         function startAudio() {
             audio.play().catch(err => {
-                console.log("Audio initialization restriction handled or resource structure altered: ", err);
+                console.log("Audio failed to play. Verify your URL source configuration: ", err);
             });
         }
 
@@ -199,9 +199,9 @@ HTML = """<!DOCTYPE html>
             prompt.style.display = 'none';
         });
 
-        // Clicking directly on the text box will clear it and restore the initial state
+        // Panel stays open when clicked, collapses only when clicked directly
         infoBox.addEventListener('click', (e) => {
-            e.stopPropagation(); // Avoid triggering canvas handler elements
+            e.stopPropagation(); 
             infoBox.classList.remove('show');
             prompt.style.display = 'block';
         });
