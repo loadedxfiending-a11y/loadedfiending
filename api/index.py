@@ -125,9 +125,8 @@ HTML = """<!DOCTYPE html>
         ...ye, that's about all
     </div>
 
-    <!-- Hidden audio + volume slider -->
-    <audio id="bg-music" autoplay loop>
-        <source src="https://www.youtube.com/redirect?event=video_description&redir_token=QUFFLUhqbFhIZjZ1dEx3cDRDcGFYZ3VieGxLZ0RTdFJRd3xBQ3Jtc0tsU3JSWl9JWVdiWU5YajhZT1NPNU1fTE1yR1J6c2l3Q0F0VUJHNFpJMmhnVHVFRDViVHRCZDB2TVR2TjNZTHdhUHJEWTNGQWk1d3FaTzgtRjFSVTlyYzNaSE1hTmh4TEJVa1VwVlN2MEltTUpXbE5RQQ&q=https%3A%2F%2Fwww.dropbox.com%2Fscl%2Ffi%2F6o3k5z2q8u5x1v8w9y0z2%2Fdream-loaded-music.mp3%3Frlkey%3Dabc123%26dl%3D0" type="audio/mpeg">
+    <audio id="bg-music" loop>
+        <source src="https://www.dropbox.com/scl/fi/6o3k5z2q8u5x1v8w9y0z2/dream-loaded-music.mp3?rlkey=abc123&raw=1" type="audio/mpeg">
         Your browser does not support the audio element.
     </audio>
 
@@ -179,11 +178,28 @@ HTML = """<!DOCTYPE html>
         }
         setInterval(draw, 40);
 
-        // ── Click handler ──
+        // ── Elements ──
         const infoBox = document.getElementById('info');
         const prompt = document.getElementById('prompt');
+        const audio = document.getElementById('bg-music');
+        const slider = document.getElementById('volume-slider');
+        const volLabel = document.getElementById('vol-label');
 
+        // Set initial volume to 50%
+        audio.volume = 0.5;
+
+        // Function to securely play audio after user interaction
+        function startAudio() {
+            audio.play().catch(err => {
+                console.log("Playback blocked or link configuration issue: ", err);
+            });
+        }
+
+        // ── Click handler ──
         canvas.addEventListener('click', () => {
+            // Trigger playback on click to satisfy browser policies
+            startAudio();
+
             infoBox.classList.add('show');
             prompt.style.display = 'none';
             clearTimeout(window.infoTimeout);
@@ -192,6 +208,7 @@ HTML = """<!DOCTYPE html>
                 prompt.style.display = 'block';
             }, 8000);
         });
+
         infoBox.addEventListener('click', () => {
             infoBox.classList.remove('show');
             prompt.style.display = 'block';
@@ -199,13 +216,6 @@ HTML = """<!DOCTYPE html>
         });
 
         // ── Volume control ──
-        const audio = document.getElementById('bg-music');
-        const slider = document.getElementById('volume-slider');
-        const volLabel = document.getElementById('vol-label');
-
-        // Set initial volume to 50%
-        audio.volume = 0.5;
-
         slider.addEventListener('input', () => {
             const vol = slider.value / 100;
             audio.volume = vol;
