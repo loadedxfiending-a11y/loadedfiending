@@ -56,16 +56,16 @@ HTML = """<!DOCTYPE html>
         }
         #info.show { display: block; }
         
-        /* Profile Picture Styling */
         #pfp {
-            width: 100px;
-            height: 100px;
+            width: 120px;
+            height: 120px;
             border-radius: 50%;
             border: 2px solid #ff3333;
             box-shadow: 0 0 15px #ff0000;
             margin: 0 auto 1.5rem auto;
             display: block;
             object-fit: cover;
+            background-color: #000;
         }
 
         .text-content {
@@ -137,7 +137,7 @@ HTML = """<!DOCTYPE html>
     <div id="prompt">click on the screen to learn about me!</div>
     
     <div id="info">
-        <img id="pfp" src="/pfp.webp" alt="pfp">
+        <img id="pfp" src="/avatar.png" alt="Profile Picture">
         <div class="text-content">Hey, I'm dream/loaded
             I'm learning more about
             C++, C#, HTML
@@ -205,37 +205,28 @@ HTML = """<!DOCTYPE html>
         audio.volume = 0.5;
 
         function startAudio() {
-            // Force reload if state is stuck
             if (audio.readyState === 0) {
                 audio.load();
             }
-            
-            audio.play().then(() => {
-                print("Audio playing successfully.");
-            }).catch(err => {
-                print("Playback blocked or failed. Trying reload...", err);
-                // Fallback attempt
+            audio.play().catch(err => {
                 setTimeout(() => {
-                    audio.play().catch(e => console.log("Final playback block:", e));
-                }, 100);
+                    audio.play().catch(e => {});
+                }, 150);
             });
         }
 
-        // Volume control
         slider.addEventListener('input', () => {
             const vol = slider.value / 100;
             audio.volume = vol;
             volLabel.textContent = Math.round(vol * 100) + '%';
         });
 
-        // Click to play + show info
         canvas.addEventListener('click', () => {
             startAudio();
             infoBox.classList.add('show');
             prompt.style.display = 'none';
         });
 
-        // Clicking info closes it
         infoBox.addEventListener('click', (e) => {
             e.stopPropagation();
             infoBox.classList.remove('show');
@@ -249,10 +240,20 @@ HTML = """<!DOCTYPE html>
 def index():
     return render_template_string(HTML)
 
-# Route to serve the profile picture from the local root folder
-@app.route('/pfp.webp')
+# Bulletproof routing for the profile picture file
+@app.route('/avatar.png')
 def serve_pfp():
-    return send_from_directory(os.getcwd(), 'pfp.webp')
+    current_dir = os.getcwd()
+    
+    # Check for the custom file names inside your running directory
+    if os.path.exists(os.path.join(current_dir, 'original.png')):
+        return send_from_directory(current_dir, 'original.png')
+    elif os.path.exists(os.path.join(current_dir, 'hahahaahahhahah.webp')):
+        return send_from_directory(current_dir, 'hahahaahahhahah.webp')
+    elif os.path.exists(os.path.join(current_dir, 'pfp.webp')):
+        return send_from_directory(current_dir, 'pfp.webp')
+    else:
+        return "Image file not found in the script directory.", 404
 
 if __name__ == '__main__':
     app.run(debug=True)
