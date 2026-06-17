@@ -124,8 +124,8 @@ HTML = """<!DOCTYPE html>
         ...ye, that's about all
     </div>
 
-    <audio id="bg-music" loop>
-        <source src="https://www.youtube.com/watch?v=viRBj5CMiZ8&list=RDMMviRBj5CMiZ8&index=1" type="audio/mpeg">
+    <audio id="bg-music" loop prefetch="auto">
+        <source src="https://files.catbox.moe/2sreco.mp3" type="audio/mpeg">
         Your browser does not support the audio element.
     </audio>
 
@@ -187,8 +187,10 @@ HTML = """<!DOCTYPE html>
         audio.volume = 0.5;
 
         function startAudio() {
-            audio.play().catch(err => {
-                console.log("Audio failed to play. Verify your URL source configuration: ", err);
+            audio.play().then(() => {
+                console.log("Playback started successfully.");
+            }).catch(err => {
+                console.log("Audio play blocked or failed: ", err);
             });
         }
 
@@ -199,7 +201,7 @@ HTML = """<!DOCTYPE html>
             prompt.style.display = 'none';
         });
 
-        // Panel stays open when clicked, collapses only when clicked directly
+        // Stops code from breaking/disappearing when clicking inside the panel
         infoBox.addEventListener('click', (e) => {
             e.stopPropagation(); 
             infoBox.classList.remove('show');
