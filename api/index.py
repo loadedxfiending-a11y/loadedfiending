@@ -18,36 +18,53 @@ HTML = """<!DOCTYPE html>
             cursor: crosshair;
         }
         canvas { display: block; position: fixed; top: 0; left: 0; width: 100%; height: 100%; }
+        #prompt {
+            position: fixed;
+            bottom: 3rem;
+            left: 50%;
+            transform: translateX(-50%);
+            color: rgba(255, 60, 60, 0.6);
+            font-size: 0.9rem;
+            letter-spacing: 1px;
+            z-index: 5;
+            pointer-events: none;
+            animation: pulse 2s ease-in-out infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 0.4; }
+            50%      { opacity: 1; }
+        }
         #info {
             display: none;
             position: fixed;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            color: #00ffff;
-            font-size: 1.8rem;
+            color: #ff3333;
+            font-size: 1.2rem;
             text-align: center;
-            text-shadow: 0 0 20px #00ffff, 0 0 40px #0088ff;
-            background: rgba(0,0,0,0.75);
-            padding: 2rem 3rem;
-            border: 2px solid #00ffff;
-            border-radius: 12px;
-            box-shadow: 0 0 30px rgba(0,255,255,0.3);
+            text-shadow: 0 0 15px #ff0000, 0 0 30px #aa0000;
+            background: rgba(0,0,0,0.8);
+            padding: 1.2rem 2rem;
+            border: 1px solid #ff3333;
+            border-radius: 8px;
+            box-shadow: 0 0 20px rgba(255,0,0,0.2);
             z-index: 10;
             white-space: pre-line;
-            line-height: 1.6;
+            line-height: 1.5;
             pointer-events: none;
             animation: fadeIn 0.3s ease;
         }
         #info.show { display: block; }
         @keyframes fadeIn {
-            from { opacity: 0; transform: translate(-50%, -50%) scale(0.8); }
+            from { opacity: 0; transform: translate(-50%, -50%) scale(0.9); }
             to   { opacity: 1; transform: translate(-50%, -50%) scale(1); }
         }
     </style>
 </head>
 <body>
     <canvas id="matrix"></canvas>
+    <div id="prompt">click on the screen to learn about me!</div>
     <div id="info">
         Hey, I'm dream/loaded
         I'm learning more about
@@ -62,46 +79,56 @@ HTML = """<!DOCTYPE html>
         function resize() {
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
-            cols = Math.floor(canvas.width / 20);
+            cols = Math.floor(canvas.width / 18);
             drops = Array(cols).fill(1);
         }
         window.addEventListener('resize', resize);
         resize();
 
-        const chars = 'ﾊﾐﾋｰｳｼﾅﾓﾆｻﾜﾂｵﾘｱﾎﾃﾏｹﾒｴｶｷﾑﾕﾗｾﾈｽﾀﾇﾍ01アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン';
-
         function draw() {
-            ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.07)';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
-            ctx.fillStyle = '#00ffff';
-            ctx.font = '20px monospace';
 
             for (let i = 0; i < drops.length; i++) {
-                const char = chars[Math.floor(Math.random() * chars.length)];
-                const x = i * 20;
-                const y = drops[i] * 20;
-                ctx.fillStyle = 'rgba(0, 255, 255, 0.25)';
-                ctx.fillText(char, x, y);
-                ctx.fillStyle = '#00ffff';
-                ctx.shadowBlur = 15;
-                ctx.shadowColor = '#00ffff';
-                ctx.fillText(char, x, y - 20);
-                ctx.fillText(chars[Math.floor(Math.random() * chars.length)], x, y - 20);
+                const x = i * 18;
+                const y = drops[i] * 18;
+
+                // tail dot
+                ctx.fillStyle = 'rgba(255, 50, 50, 0.2)';
+                ctx.beginPath();
+                ctx.arc(x, y, 2, 0, Math.PI * 2);
+                ctx.fill();
+
+                // head dot - brighter
+                ctx.fillStyle = '#ff3333';
+                ctx.shadowBlur = 12;
+                ctx.shadowColor = '#ff0000';
+                ctx.beginPath();
+                ctx.arc(x, y - 18, 3, 0, Math.PI * 2);
+                ctx.fill();
                 ctx.shadowBlur = 0;
-                if (y > canvas.height && Math.random() > 0.975) drops[i] = 0;
+
+                if (y > canvas.height + 20 && Math.random() > 0.975) drops[i] = 0;
                 drops[i]++;
             }
         }
-        setInterval(draw, 50);
+        setInterval(draw, 40);
 
         const infoBox = document.getElementById('info');
+        const prompt = document.getElementById('prompt');
+
         canvas.addEventListener('click', () => {
             infoBox.classList.add('show');
+            prompt.style.display = 'none';
             clearTimeout(window.infoTimeout);
-            window.infoTimeout = setTimeout(() => infoBox.classList.remove('show'), 8000);
+            window.infoTimeout = setTimeout(() => {
+                infoBox.classList.remove('show');
+                prompt.style.display = 'block';
+            }, 8000);
         });
         infoBox.addEventListener('click', () => {
             infoBox.classList.remove('show');
+            prompt.style.display = 'block';
             clearTimeout(window.infoTimeout);
         });
     </script>
